@@ -1,0 +1,83 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { motion } from "motion/react";
+import Compo5 from "./compo5";
+
+export default function Compo4() {
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [votedUsers, setVotedUsers] = useState(0);
+
+    const isFinished = totalUsers > 0 && votedUsers === totalUsers;
+
+    useEffect(() => {
+        const fetchResults = async () => {
+            const { count: total } = await supabase
+                .from("users")
+                .select("*", { count: "exact", head: true });
+
+            const { count: voted } = await supabase
+                .from("users")
+                .select("*", { count: "exact", head: true })
+                .eq("voted", true);
+
+            setTotalUsers(total || 0);
+            setVotedUsers(voted || 0);
+        };
+
+        fetchResults();
+
+        const interval = setInterval(fetchResults, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const turnoutPercentage = totalUsers > 0 ? Math.round((votedUsers / totalUsers) * 100) : 0;
+
+    useEffect(() => {
+        if (isFinished) {
+            setTimeout(() => {
+                document.getElementById("compo4")?.scrollIntoView({ behavior: "smooth" });
+            }, 800);
+        }
+    }, [isFinished]);
+
+    return (
+        <>
+            <section id="compo3" className="snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] border-t border-[#222] px-4 py-10 sm:px-6">
+                <div className="relative z-10 text-center max-w-4xl w-full">
+                    <div className="mx-auto w-full max-w-lg flex flex-col items-center justify-center rounded-3xl bg-[#1a1a1a] p-7 border border-[#333] sm:p-10 md:p-12">
+                        <span className="mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-400 sm:text-xs sm:tracking-[0.3em]">
+                            Turnout
+                        </span>
+                        <div className="mb-7 flex items-baseline justify-center gap-1 sm:mb-8">
+                            <span className="text-[4rem] font-bold leading-none text-white tracking-tighter sm:text-[5rem] md:text-[6rem]">{turnoutPercentage}</span>
+                            <span className="text-2xl font-bold text-zinc-600 sm:text-3xl md:text-4xl">%</span>
+                        </div>
+
+                        <div className="h-3 w-full overflow-hidden rounded-full bg-[#0a0a0a] border border-[#222]">
+                            <motion.div
+                                className="h-full rounded-full bg-white"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${turnoutPercentage}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                            />
+                        </div>
+
+                        <div className="mt-8 flex w-full items-center justify-between text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                            <span>{votedUsers} Voted</span>
+                            <span>{totalUsers} Total</span>
+                        </div>
+
+                        <div className="mt-8 text-xs font-mono text-zinc-600 flex justify-center items-center gap-2 sm:mt-12">
+                            <span className="h-2 w-2 rounded-full bg-white opacity-80" />
+                            Live Sync
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {isFinished && <Compo5 />}
+        </>
+    );
+}
