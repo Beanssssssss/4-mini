@@ -189,7 +189,7 @@ export default function PopcornManifestoHero({
                 <strong className="mt-1 text-xl font-bold text-gray-900">발표</strong>
               </div>
               <div className="rounded-full bg-gray-100 px-4 py-2 font-mono text-sm font-semibold text-gray-600">
-                20:30 - 21:30
+                20:30 - 21:00
               </div>
             </div>
           </motion.div>
