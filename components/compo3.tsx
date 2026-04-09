@@ -1,313 +1,168 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { supabase } from "@/lib/supabase";
-import Compo4 from "./compo4";
+import React, { useState, useEffect } from "react";
+import { motion } from "motion/react";
 
-type HackathonUser = {
-    id: string;
-    name: string;
-    code: string;
-    team: number | string;
-    voted: boolean;
-};
-
+const TARGET_DATE = new Date("2026-04-09T20:30:00+09:00");
+const COLORS = {
+    light: {
+      background: "#F7F7F7",
+    },
+  } as const;
+  
+  function PopcornLogo({ className = "" }: { className?: string }) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="6" height="6" rx="1" fill="#1a1a1a" />
+        <rect x="14" y="4" width="6" height="6" rx="1" fill="#1a1a1a" />
+        <rect x="4" y="14" width="6" height="6" rx="1" fill="#1a1a1a" />
+        <rect x="14" y="14" width="6" height="6" rx="1" fill="#1a1a1a" />
+      </svg>
+    );
+  }
 export default function Compo3() {
-    const [name, setName] = useState("");
-    const [code, setCode] = useState("");
-    const [user, setUser] = useState<HackathonUser | null>(null);
-    const [votedTeam, setVotedTeam] = useState<number | null>(null);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [showCompo3, setShowCompo3] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(() => {
+        const difference = TARGET_DATE.getTime() - Date.now();
+        return Math.max(0, Math.floor(difference / 1000));
+    });
 
-    // 컴포넌트 마운트 시 로컬스토리지 세션 복구 자동 로그인
     useEffect(() => {
-        const checkSession = async () => {
-            const sessionData = localStorage.getItem("hackathon_session");
-            if (!sessionData) return;
-
-            try {
-                const { savedName, savedCode } = JSON.parse(sessionData);
-                if (!savedName || !savedCode) return;
-
-                setName(savedName);
-                setCode(savedCode);
-                setLoading(true);
-
-                const { data: foundUser, error: searchError } = await supabase
-                    .from("users")
-                    .select("*")
-                    .eq("name", savedName)
-                    .eq("code", savedCode)
-                    .single();
-
-                if (searchError || !foundUser) {
-                    localStorage.removeItem("hackathon_session");
-                    setLoading(false);
-                    return;
-                }
-
-                if (foundUser.voted) {
-                    const { data: voteData } = await supabase
-                        .from("votes")
-                        .select("team")
-                        .eq("user_id", foundUser.id)
-                        .order("created_at", { ascending: false })
-                        .limit(1)
-                        .maybeSingle();
-
-                    if (voteData) {
-                        setVotedTeam(voteData.team);
-                    }
-                }
-
-                setUser(foundUser);
-            } catch (err) {
-                console.error("세션 복원 중 오류 발생", err);
-                localStorage.removeItem("hackathon_session");
-            } finally {
-                setLoading(false);
-            }
+        const calculateTimeLeft = () => {
+            const difference = TARGET_DATE.getTime() - Date.now();
+            return Math.max(0, Math.floor(difference / 1000));
         };
 
-        checkSession();
+        const interval = setInterval(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
-    const handleExit = () => {
-        setShowCompo3(true);
-        setTimeout(() => {
-            document.getElementById("compo3")?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+
+        return `${h.toString().padStart(2, "0")}:${m
+            .toString()
+            .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     };
 
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        setUser(null);
-        setVotedTeam(null);
-        setLoading(true);
-
-        const { data: foundUser, error: searchError } = await supabase
-            .from("users")
-            .select("*")
-            .eq("name", name)
-            .eq("code", code)
-            .single();
-
-        if (searchError || !foundUser) {
-            setError("이름과 코드가 일치하는 사용자를 찾을 수 없습니다.");
-            setLoading(false);
-            return;
-        }
-
-        if (foundUser.voted) {
-            const { data: voteData } = await supabase
-                .from("votes")
-                .select("team")
-                .eq("user_id", foundUser.id)
-                .order("created_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-            if (voteData) {
-                setVotedTeam(voteData.team);
-            }
-        }
-
-        // 로그인 성공 시 세션(이름, 코드)을 기록해둔다
-        localStorage.setItem("hackathon_session", JSON.stringify({ savedName: name, savedCode: code }));
-
-        setUser(foundUser);
-        setLoading(false);
+    const getStatus = () => {
+        if (timeLeft <= 10 * 60) return "emergency";
+        if (timeLeft <= 20 * 60) return "critical";
+        if (timeLeft <= 30 * 60) return "warning";
+        return "normal";
     };
 
-    const handleVote = async (teamNum: number) => {
-        if (!user) return;
-        if (user.voted) {
-            setError("이미 투표를 확정하여 변경할 수 없습니다.");
-            return;
-        }
-        if (Number(user.team) === teamNum) {
-            setError("본인 팀에는 투표할 수 없습니다.");
-            return;
-        }
-        if (votedTeam === teamNum) {
-            setError("이미 해당 팀에 투표하셨습니다.");
-            return;
-        }
+    const status = getStatus();
 
-        const previousTeam = votedTeam;
-        setVotedTeam(teamNum);
-        setLoading(true);
-        setError("");
-
-        // DB 테이블에 Unique 제약조건이 명시되지 않았으므로
-        // 안전하게 기존 투표를 깔끔하게 모두 지우고 새로 Insert 처리하여 완벽한 Upsert(수정) 효과를 냅니다.
-        const { error: deleteError } = await supabase
-            .from("votes")
-            .delete()
-            .eq("user_id", user.id);
-
-        const { error: voteError } = await supabase
-            .from("votes")
-            .insert([{ user_id: user.id, team: teamNum }]);
-
-        if (voteError || deleteError) {
-            setVotedTeam(previousTeam);
-            setError("투표 처리 중 오류가 발생했습니다.");
-            setLoading(false);
-            return;
-        }
-
-        if (!user.voted) {
-            const { error: updateError } = await supabase
-                .from("users")
-                .update({ voted: true })
-                .eq("id", user.id);
-
-            if (!updateError) {
-                setUser({ ...user, voted: true });
-            }
-        }
-
-        setLoading(false);
-
-        setTimeout(() => {
-            handleExit();
-        }, 1200);
-    };
+    const theme = {
+        normal: {
+            bg: "bg-white",
+            text: "text-slate-900",
+            accent: "bg-slate-100",
+            label: "TIMER",
+        },
+        warning: {
+            bg: "bg-amber-50",
+            text: "text-amber-900",
+            accent: "bg-amber-100",
+            label: "30 MIN LEFT",
+        },
+        critical: {
+            bg: "bg-orange-50",
+            text: "text-orange-900",
+            accent: "bg-orange-100",
+            label: "20 MIN LEFT",
+        },
+        emergency: {
+            bg: "bg-red-50",
+            text: "text-red-900",
+            accent: "bg-red-100",
+            label: "CRITICAL: < 10 MIN",
+        },
+    }[status];
 
     return (
-        <>
-            <section className="snap-start relative min-h-[100dvh] w-full flex items-center justify-center bg-[#111] px-4 py-12 border-t border-[#222] overflow-hidden sm:px-6">
-                <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-24 relative z-10">
+        <section
+            className={`snap-start relative min-h-[100dvh] w-full overflow-hidden transition-colors duration-1000 ${theme.bg}`}
+        >
+            <motion.header
+                initial={{ opacity: 0, y: -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="absolute left-4 top-6 z-20 flex items-center gap-2 sm:left-6 sm:top-8 lg:left-8 lg:top-10"
+            >
+                <PopcornLogo className="h-5 w-5" />
+                <span className="text-base font-bold text-[#1a1a1a]">Hateslop 4th</span>
+            </motion.header>
 
-                    {/* 좌측: 투표 기능 */}
-                    <div className="w-full max-w-lg flex flex-col text-center lg:text-left mx-auto lg:mx-0">
-                        <h2 className="mb-3 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-                            Votes
-                        </h2>
-                        <p className="mb-9 text-base text-zinc-500 font-medium sm:mb-12 sm:text-lg">
-                            가장 마음에 드는 팀에게 투표하세요.
-                        </p>
+            {/* Background Decorative Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white/5 blur-3xl" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-white/5 blur-3xl" />
+            </div>
 
-                        {!user ? (
-                            <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:gap-4 w-full max-w-sm mx-auto lg:mx-0">
-                                <input
-                                    type="text"
-                                    placeholder="이름"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="w-full rounded-2xl border border-[#333] bg-[#1a1a1a] px-4 py-3.5 text-base text-white placeholder-zinc-600 transition-colors focus:border-zinc-400 focus:outline-none sm:px-5 sm:py-4 sm:text-lg"
-                                    required
-                                />
-                                <input
-                                    type="password"
-                                    placeholder="비밀 코드"
-                                    value={code}
-                                    onChange={(e) => setCode(e.target.value)}
-                                    className="w-full rounded-2xl border border-[#333] bg-[#1a1a1a] px-4 py-3.5 text-base text-white placeholder-zinc-600 transition-colors focus:border-zinc-400 focus:outline-none sm:px-5 sm:py-4 sm:text-lg"
-                                    required
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="mt-2 w-full rounded-2xl bg-white text-black py-3.5 text-base font-bold transition-transform hover:scale-[0.98] active:scale-[0.95] disabled:opacity-50 disabled:hover:scale-100 sm:py-4 sm:text-lg"
-                                >
-                                    {loading ? "확인 중..." : "들어가기"}
-                                </button>
-                                {error && <p className="mt-2 text-sm font-medium text-red-500">{error}</p>}
-                            </form>
-                        ) : (
-                            <div className="flex flex-col gap-8 w-full max-w-lg mx-auto lg:mx-0">
-                                <div className="flex items-center justify-between rounded-2xl border border-[#333] bg-[#1a1a1a] p-5 text-left">
-                                    <div>
-                                        <p className="text-zinc-400 text-sm">
-                                            안녕하세요, <strong className="text-white text-base">{user.name}</strong> 님
-                                        </p>
-                                    </div>
-                                </div>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col items-center justify-center px-4 py-12 sm:px-6"
+            >
+                {/* Status Label */}
+                <motion.div
+                    key={status}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className={`mb-5 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-[0.2em] sm:text-xs sm:tracking-widest ${theme.accent} ${theme.text} border border-black/5 shadow-sm`}
+                >
+                    {theme.label}
+                </motion.div>
 
-                                {user.voted && (
-                                    <div className="mb-3 flex flex-col items-center gap-3">
-                                        <button
-                                            onClick={handleExit}
-                                            className="rounded-full bg-white px-8 py-2.5 text-sm font-bold text-black transition-colors hover:bg-zinc-200"
-                                        >
-                                            실시간 투표 현황 보러가기
-                                        </button>
-                                    </div>
-                                )}
-
-                                <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
-                                    {[1, 2, 3, 4, 5].map((t) => {
-                                        const isUserTeam = Number(user.team) === t;
-                                        const isVotedTeam = t === votedTeam;
-
-                                        return (
-                                            <button
-                                                key={t}
-                                                onClick={() => handleVote(t)}
-                                                disabled={isUserTeam || loading || user.voted}
-                                                className={`relative rounded-2xl border p-4 text-lg font-bold transition-all sm:p-6 sm:text-xl ${isVotedTeam
-                                                    ? "border-white bg-white text-black cursor-not-allowed scale-[0.98]"
-                                                    : isUserTeam
-                                                        ? "cursor-not-allowed border-[#1a1a1a] bg-[#111] text-[#333]"
-                                                        : user.voted
-                                                            ? "cursor-not-allowed border-[#222] bg-[#111] text-zinc-600 opacity-60"
-                                                            : "border-[#333] bg-[#1a1a1a] text-white hover:bg-[#222] hover:border-[#555]"
-                                                    }`}
-                                            >
-                                                {t} 팀
-                                                {isUserTeam && (
-                                                    <span className="absolute right-4 top-4 text-[10px] font-medium text-zinc-600 uppercase">
-                                                        Me
-                                                    </span>
-                                                )}
-                                                {isVotedTeam && (
-                                                    <span className="absolute right-4 top-4 text-[10px] font-black text-black tracking-widest uppercase">
-                                                        VOTED
-                                                    </span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                {error && <p className="text-sm font-medium text-red-500">{error}</p>}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* 우측 여백: 투표 일러스트 & 말풍선 */}
-                    <div className="flex w-full max-w-sm items-center justify-center pointer-events-none select-none lg:w-1/2 lg:max-w-none">
-                        <div className="relative w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[420px] xl:max-w-[500px]">
-                            {/* 툴팁/말풍선 */}
-                            <div className="absolute left-2 top-2 z-20 max-w-[290px] rounded-2xl bg-white px-4 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] xl:-left-12 xl:-top-6 xl:px-5 xl:py-3.5">
-                                <span className="flex items-center gap-2 text-xs font-black tracking-tight text-black xl:text-sm">
-                                    비밀 코드는 전화번호 뒷 4자리입니다.
-                                </span>
-                                {/* 말풍선 꼬리 */}
-                                <div className="absolute -bottom-2 right-8 h-3.5 w-3.5 rotate-45 bg-white xl:right-12 xl:h-4 xl:w-4" />
-                            </div>
-
-                            <Image
-                                src="/vote.png"
-                                alt="Vote Decor Icon"
-                                width={500}
-                                height={500}
-                                className="h-auto w-full opacity-95 drop-shadow-2xl grayscale-[20%]"
-                                priority
-                            />
-                        </div>
-                    </div>
-
+                {/* Timer Display */}
+                <div className="relative">
+                    {status === "emergency" && (
+                        <motion.div
+                            animate={{
+                                scale: [1, 1.05, 1],
+                                opacity: [0.3, 0.6, 0.3],
+                            }}
+                            transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                            }}
+                            className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full"
+                        />
+                    )}
+                    <motion.h2
+                        className={`text-center font-mono text-5xl font-black tracking-tighter sm:text-7xl md:text-[8rem] lg:text-[10rem] xl:text-[12rem] ${theme.text} drop-shadow-2xl`}
+                        animate={status === "emergency" ? { scale: [1, 1.02, 1] } : {}}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                    >
+                        {formatTime(timeLeft)}
+                    </motion.h2>
                 </div>
-            </section>
 
-            {showCompo3 && <Compo4 />}
-        </>
+                {/* Target Date Info */}
+                <div className="mt-7 flex flex-col items-center opacity-50">
+                    <span className="text-[11px] font-medium tracking-[0.18em] uppercase sm:text-sm sm:tracking-widest">Target Time</span>
+                    <span className="text-base font-bold sm:text-lg">2026. 04. 09. 20:30 (KST)</span>
+                </div>
+            </motion.div>
+
+            {/* Bottom Accent */}
+            <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-100">
+                <motion.div
+                    className={`h-full ${status === "emergency" ? "bg-red-500" : "bg-slate-900"}`}
+                    initial={{ width: "100%" }}
+                    animate={{ width: "100%" }} // Not a relative progress anymore as target is fixed
+                    transition={{ duration: 1 }}
+                />
+            </div>
+        </section>
     );
 }

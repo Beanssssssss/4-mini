@@ -1,141 +1,56 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-
-const TARGET_DATE = new Date("2026-04-09T20:30:00+09:00");
+const teams = [
+    ["김민수", "이서진"],
+    ["김리나", "최가영"],
+    ["김효주", "임소현"],
+    ["김상진", "유지오"],
+    ["박소린", "이재경"],
+];
 
 export default function Compo2() {
-    const [timeLeft, setTimeLeft] = useState(() => {
-        const difference = TARGET_DATE.getTime() - Date.now();
-        return Math.max(0, Math.floor(difference / 1000));
-    });
-
-    useEffect(() => {
-        const calculateTimeLeft = () => {
-            const difference = TARGET_DATE.getTime() - Date.now();
-            return Math.max(0, Math.floor(difference / 1000));
-        };
-
-        const interval = setInterval(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const formatTime = (seconds: number) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-
-        return `${h.toString().padStart(2, "0")}:${m
-            .toString()
-            .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-    };
-
-    const getStatus = () => {
-        if (timeLeft <= 10 * 60) return "emergency";
-        if (timeLeft <= 20 * 60) return "critical";
-        if (timeLeft <= 30 * 60) return "warning";
-        return "normal";
-    };
-
-    const status = getStatus();
-
-    const theme = {
-        normal: {
-            bg: "bg-white",
-            text: "text-slate-900",
-            accent: "bg-slate-100",
-            label: "TIMER",
-        },
-        warning: {
-            bg: "bg-amber-50",
-            text: "text-amber-900",
-            accent: "bg-amber-100",
-            label: "30 MIN LEFT",
-        },
-        critical: {
-            bg: "bg-orange-50",
-            text: "text-orange-900",
-            accent: "bg-orange-100",
-            label: "20 MIN LEFT",
-        },
-        emergency: {
-            bg: "bg-red-50",
-            text: "text-red-900",
-            accent: "bg-red-100",
-            label: "CRITICAL: < 10 MIN",
-        },
-    }[status];
-
     return (
-        <section
-            className={`snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden px-4 py-12 transition-colors duration-1000 sm:px-6 ${theme.bg}`}
-        >
-            {/* Background Decorative Elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white/5 blur-3xl" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-white/5 blur-3xl" />
-            </div>
-
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative z-10 flex w-full max-w-5xl flex-col items-center"
-            >
-                {/* Status Label */}
-                <motion.div
-                    key={status}
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className={`mb-5 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-[0.2em] sm:text-xs sm:tracking-widest ${theme.accent} ${theme.text} border border-black/5 shadow-sm`}
-                >
-                    {theme.label}
-                </motion.div>
-
-                {/* Timer Display */}
-                <div className="relative">
-                    {status === "emergency" && (
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.05, 1],
-                                opacity: [0.3, 0.6, 0.3],
-                            }}
-                            transition={{
-                                duration: 1,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                            }}
-                            className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full"
-                        />
-                    )}
-                    <motion.h2
-                        className={`text-center font-mono text-5xl font-black tracking-tighter sm:text-7xl md:text-[8rem] lg:text-[10rem] xl:text-[12rem] ${theme.text} drop-shadow-2xl`}
-                        animate={status === "emergency" ? { scale: [1, 1.02, 1] } : {}}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                    >
-                        {formatTime(timeLeft)}
-                    </motion.h2>
+        <section className="snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] px-4 py-12 sm:px-6 lg:px-12 border-t border-[#222]">
+            <div className="relative z-10 w-full max-w-6xl">
+                <div className="mb-10 text-center sm:mb-12">
+                    <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.22em] text-zinc-500 sm:text-sm sm:tracking-[0.3em]">
+                        Hackathon Lineup
+                    </h2>
+                    <h3 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                        Teams
+                    </h3>
                 </div>
 
-                {/* Target Date Info */}
-                <div className="mt-7 flex flex-col items-center opacity-50">
-                    <span className="text-[11px] font-medium tracking-[0.18em] uppercase sm:text-sm sm:tracking-widest">Target Time</span>
-                    <span className="text-base font-bold sm:text-lg">2026. 04. 09. 20:30 (KST)</span>
-                </div>
-            </motion.div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {teams.map((members, idx) => {
+                        const teamId = `Team${String(idx + 1)}`;
 
-            {/* Bottom Accent */}
-            <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-100">
-                <motion.div
-                    className={`h-full ${status === "emergency" ? "bg-red-500" : "bg-slate-900"}`}
-                    initial={{ width: "100%" }}
-                    animate={{ width: "100%" }} // Not a relative progress anymore as target is fixed
-                    transition={{ duration: 1 }}
-                />
+                        return (
+                            <div
+                                key={idx}
+                                className="relative flex flex-col justify-between rounded-2xl border border-[#333] bg-[#1a1a1a] p-5 min-h-[160px] overflow-hidden transition-all hover:border-zinc-500 hover:bg-[#222] sm:rounded-3xl sm:p-8 sm:min-h-[180px]"
+                            >
+                                <div className="flex items-center justify-between mb-6 z-10 sm:mb-8">
+                                    <span className="rounded-md bg-[#2a2a2a] px-3 py-1 text-xs font-mono font-medium text-zinc-300">
+                                        {teamId}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-4 z-10 flex-wrap">
+                                    <h4 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                                        {members[0]}
+                                    </h4>
+                                    <div className="h-6 w-[1px] bg-zinc-700 hidden sm:block" />
+                                    <h4 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                                        {members[1]}
+                                    </h4>
+                                </div>
+
+                                <div className="absolute bottom-1 right-3 text-[5rem] font-black text-white/[0.03] pointer-events-none select-none leading-none sm:bottom-2 sm:right-4 sm:text-[8rem]">
+                                    {idx + 1}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </section>
     );

@@ -1,57 +1,94 @@
-const teams = [
-    ["김민수", "이서진"],
-    ["김리나", "최가영"],
-    ["김효주", "임소현"],
-    ["김상진", "유지오"],
-    ["박소린", "이재경"],
-];
+"use client";
 
+import { motion } from "motion/react";
+import Image from "next/image";
+
+const COLORS = {
+  light: {
+    background: "#F7F7F7",
+  },
+} as const;
+
+function PopcornLogo({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="6" height="6" rx="1" fill="#1a1a1a" />
+      <rect x="14" y="4" width="6" height="6" rx="1" fill="#1a1a1a" />
+      <rect x="4" y="14" width="6" height="6" rx="1" fill="#1a1a1a" />
+      <rect x="14" y="14" width="6" height="6" rx="1" fill="#1a1a1a" />
+    </svg>
+  );
+}
+
+/** `hero.tsx`와 동일한 비주얼 시스템 + 1등 상품 이미지 */
 export default function Compo1() {
-    return (
-        <section className="snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] px-4 py-12 sm:px-6 lg:px-12 border-t border-[#222]">
-            <div className="relative z-10 w-full max-w-6xl">
-                <div className="mb-10 text-center sm:mb-12">
-                    <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.22em] text-zinc-500 sm:text-sm sm:tracking-[0.3em]">
-                        Hackathon Lineup
-                    </h2>
-                    <h3 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-                        Teams
-                    </h3>
-                </div>
+  const colors = COLORS.light;
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {teams.map((members, idx) => {
-                        const teamId = `Team${String(idx + 1)}`;
+  return (
+    <section
+      className="snap-start relative min-h-[100dvh] w-full overflow-hidden border-t border-black/5"
+      style={{ backgroundColor: colors.background }}
+    >
+      <div className="relative z-10 mx-auto max-w-6xl px-6 lg:px-8">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-between py-5"
+        >
+          <div className="flex items-center gap-2">
+            <PopcornLogo className="h-5 w-5" />
+            <span className="text-base font-bold text-[#1a1a1a]">Hateslop 4th</span>
+          </div>
+        </motion.header>
 
-                        return (
-                            <div
-                                key={idx}
-                                className="relative flex flex-col justify-between rounded-2xl border border-[#333] bg-[#1a1a1a] p-5 min-h-[160px] overflow-hidden transition-all hover:border-zinc-500 hover:bg-[#222] sm:rounded-3xl sm:p-8 sm:min-h-[180px]"
-                            >
-                                <div className="flex items-center justify-between mb-6 z-10 sm:mb-8">
-                                    <span className="rounded-md bg-[#2a2a2a] px-3 py-1 text-xs font-mono font-medium text-zinc-300">
-                                        {teamId}
-                                    </span>
-                                </div>
+        <div className="flex flex-col items-center pb-16 pt-8 text-center sm:pb-20 sm:pt-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6"
+          >
+            <span
+              className="inline-block rounded-full px-5 py-2 text-sm font-bold tracking-wide text-white"
+              style={{ backgroundColor: "#1a1a1a" }}
+            >
+              Prize
+            </span>
+          </motion.div>
 
-                                <div className="flex items-center gap-4 z-10 flex-wrap">
-                                    <h4 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                                        {members[0]}
-                                    </h4>
-                                    <div className="h-6 w-[1px] bg-zinc-700 hidden sm:block" />
-                                    <h4 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                                        {members[1]}
-                                    </h4>
-                                </div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-5xl font-extrabold leading-[1.2] tracking-tight text-[#1a1a1a] sm:text-6xl lg:text-7xl"
+          >
+            1등 상품
+          </motion.h2>
 
-                                <div className="absolute bottom-1 right-3 text-[5rem] font-black text-white/[0.03] pointer-events-none select-none leading-none sm:bottom-2 sm:right-4 sm:text-[8rem]">
-                                    {idx + 1}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        </section>
-    );
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-12 w-full max-w-lg overflow-hidden rounded-2xl border border-black/5 bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-6"
+          >
+            <Image
+              src="/stb.jpg"
+              alt="1등 상품"
+              width={900}
+              height={900}
+              className="h-auto w-full rounded-xl object-contain"
+              sizes="(max-width: 768px) 100vw, 32rem"
+              priority
+            />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
 }
