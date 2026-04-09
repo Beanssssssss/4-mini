@@ -5,24 +5,20 @@ import { supabase } from "@/lib/supabase";
 import { motion } from "motion/react";
 import Compo6 from "./compo6";
 
+const TOTAL_PARTICIPANTS = 27;
+
 export default function Compo5() {
-    const [totalUsers, setTotalUsers] = useState(0);
     const [votedUsers, setVotedUsers] = useState(0);
 
-    const isFinished = totalUsers > 0 && votedUsers === totalUsers;
+    const isFinished = votedUsers >= TOTAL_PARTICIPANTS;
 
     useEffect(() => {
         const fetchResults = async () => {
-            const { count: total } = await supabase
-                .from("users")
-                .select("*", { count: "exact", head: true });
-
             const { count: voted } = await supabase
                 .from("users")
                 .select("*", { count: "exact", head: true })
                 .eq("voted", true);
 
-            setTotalUsers(total || 0);
             setVotedUsers(voted || 0);
         };
 
@@ -32,7 +28,10 @@ export default function Compo5() {
         return () => clearInterval(interval);
     }, []);
 
-    const turnoutPercentage = totalUsers > 0 ? Math.round((votedUsers / totalUsers) * 100) : 0;
+    const turnoutPercentage = Math.min(
+        100,
+        Math.round((votedUsers / TOTAL_PARTICIPANTS) * 100)
+    );
 
     useEffect(() => {
         if (isFinished) {
@@ -66,7 +65,7 @@ export default function Compo5() {
 
                         <div className="mt-8 flex w-full items-center justify-between text-xs font-bold tracking-widest text-zinc-500 uppercase">
                             <span>{votedUsers} Voted</span>
-                            <span>{totalUsers} Total</span>
+                            <span>{TOTAL_PARTICIPANTS} Total</span>
                         </div>
 
                         <div className="mt-8 text-xs font-mono text-zinc-600 flex justify-center items-center gap-2 sm:mt-12">

@@ -21,16 +21,18 @@ const COLORS = {
     );
   }
 export default function Compo3() {
-    const [timeLeft, setTimeLeft] = useState(() => {
-        const difference = TARGET_DATE.getTime() - Date.now();
-        return Math.max(0, Math.floor(difference / 1000));
-    });
+    const [mounted, setMounted] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(0);
 
     useEffect(() => {
+        setMounted(true);
+
         const calculateTimeLeft = () => {
             const difference = TARGET_DATE.getTime() - Date.now();
             return Math.max(0, Math.floor(difference / 1000));
         };
+
+        setTimeLeft(calculateTimeLeft());
 
         const interval = setInterval(() => {
             setTimeLeft(calculateTimeLeft());
@@ -143,7 +145,7 @@ export default function Compo3() {
                         animate={status === "emergency" ? { scale: [1, 1.02, 1] } : {}}
                         transition={{ duration: 0.5, repeat: Infinity }}
                     >
-                        {formatTime(timeLeft)}
+                        {mounted ? formatTime(timeLeft) : "00:00:00"}
                     </motion.h2>
                 </div>
 
