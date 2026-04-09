@@ -181,7 +181,7 @@ export default function Compo4() {
 
     return (
         <>
-            <section className="snap-start relative h-[100dvh] w-full flex items-center justify-center bg-[#111] px-4 py-8 border-t border-[#222] overflow-hidden sm:px-6">
+            <section className="snap-start relative min-h-[100dvh] w-full flex items-center justify-center bg-[#111] px-4 py-8 border-t border-[#222] overflow-hidden sm:px-6 lg:h-[100dvh]">
                 <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-24 relative z-10">
 
                     {/* 좌측: 투표 기능 */}

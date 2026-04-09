@@ -8,7 +8,7 @@ const teams = [
 
 export default function Compo2() {
     return (
-        <section className="snap-start relative h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] px-4 py-8 sm:px-6 lg:px-12 border-t border-[#222]">
+        <section className="snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] px-4 py-8 sm:px-6 lg:h-[100dvh] lg:px-12 border-t border-[#222]">
             <div className="relative z-10 w-full max-w-7xl">
                 <div className="mb-10 text-center sm:mb-12">
                     <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.22em] text-zinc-500 sm:text-sm sm:tracking-[0.3em]">

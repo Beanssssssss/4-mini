@@ -89,7 +89,7 @@ export default function Compo3() {
 
     return (
         <section
-            className={`snap-start relative h-[100dvh] w-full overflow-hidden transition-colors duration-1000 ${theme.bg}`}
+            className={`snap-start relative min-h-[100dvh] w-full overflow-hidden transition-colors duration-1000 lg:h-[100dvh] ${theme.bg}`}
         >
             <motion.header
                 initial={{ opacity: 0, y: -20 }}

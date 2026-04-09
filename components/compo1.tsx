@@ -26,7 +26,7 @@ export default function Compo1() {
 
   return (
     <section
-      className="snap-start relative h-[100dvh] w-full overflow-hidden border-t border-black/5"
+      className="snap-start relative min-h-[100dvh] w-full overflow-hidden border-t border-black/5 lg:h-[100dvh]"
       style={{ backgroundColor: colors.background }}
     >
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

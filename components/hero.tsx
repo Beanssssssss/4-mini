@@ -124,7 +124,7 @@ export default function PopcornManifestoHero({
 
   return (
     <section
-      className="relative h-[100dvh] w-full overflow-hidden"
+      className="relative min-h-[100dvh] w-full overflow-hidden lg:h-[100dvh]"
       style={{ backgroundColor: colors.background }}
     >
       {/* Container */}
