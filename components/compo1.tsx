@@ -87,6 +87,7 @@ export default function Compo1() {
               priority
             />
           </motion.div>
+
         </div>
       </div>
     </section>

@@ -299,6 +299,7 @@ export default function Compo4() {
                                 width={500}
                                 height={500}
                                 className="h-auto w-full opacity-95 drop-shadow-2xl grayscale-[20%]"
+                                style={{ width: "100%", height: "auto" }}
                                 priority
                             />
                         </div>

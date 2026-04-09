@@ -32,6 +32,18 @@ export default function Compo0() {
             </ul>
           </article>
         </div>
+
+        <div className="rounded-2xl border border-white/10 bg-[#171717]/80 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.25)] sm:p-7">
+          <p className="text-sm font-semibold text-zinc-200 sm:text-base">예시 프로젝트 링크</p>
+          <a
+            href="https://github.com/softee220/Agent_nutritionist"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-block break-all text-sm text-blue-300 underline underline-offset-4 hover:text-blue-200 sm:text-base"
+          >
+            https://github.com/softee220/Agent_nutritionist
+          </a>
+        </div>
       </div>
     </section>
   );
