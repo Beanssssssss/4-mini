@@ -29,7 +29,7 @@ export default function Compo1() {
       className="snap-start relative min-h-[100dvh] w-full overflow-hidden border-t border-black/5"
       style={{ backgroundColor: colors.background }}
     >
-      <div className="relative z-10 mx-auto max-w-6xl px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}

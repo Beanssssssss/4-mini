@@ -1,7 +1,7 @@
 export default function Compo0() {
   return (
     <section className="snap-start relative min-h-[100dvh] w-full overflow-hidden border-t border-[#222] bg-[#111] px-4 py-14 text-white sm:px-6 lg:px-12">
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 sm:gap-10">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-8 sm:gap-10">
           <h2 className="text-[clamp(2rem,5.2vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.02em] text-zinc-100">
             자유 주제
           </h2>
