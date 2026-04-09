@@ -43,7 +43,7 @@ export default function Compo5() {
 
     return (
         <>
-            <section id="hackathon-turnout" className="snap-start relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] border-t border-[#222] px-4 py-10 sm:px-6">
+            <section id="hackathon-turnout" className="snap-start relative h-[100dvh] w-full flex flex-col items-center justify-center bg-[#111] border-t border-[#222] px-4 py-8 sm:px-6">
                 <div className="relative z-10 text-center max-w-6xl w-full">
                     <div className="mx-auto w-full max-w-lg flex flex-col items-center justify-center rounded-3xl bg-[#1a1a1a] p-7 border border-[#333] sm:p-10 md:p-12">
                         <span className="mb-5 text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-400 sm:text-xs sm:tracking-[0.3em]">

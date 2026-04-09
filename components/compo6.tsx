@@ -58,7 +58,7 @@ export default function Compo6() {
     }, [stage, countdown]);
 
     return (
-        <section id="hackathon-winner" className="snap-start relative min-h-[100dvh] w-full flex items-center justify-center bg-zinc-950 border-t border-[#222] px-4 py-14 overflow-hidden text-white sm:px-6 sm:py-20">
+        <section id="hackathon-winner" className="snap-start relative h-[100dvh] w-full flex items-center justify-center bg-zinc-950 border-t border-[#222] px-4 py-8 overflow-hidden text-white sm:px-6 sm:py-10">
             <div className="relative z-10 w-full max-w-3xl text-center flex flex-col items-center justify-center">
                 <AnimatePresence mode="wait">
                     {stage === "loading" && (
