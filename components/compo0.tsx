@@ -41,7 +41,7 @@ export default function Compo0() {
             rel="noreferrer"
             className="mt-2 inline-block break-all text-sm text-blue-300 underline underline-offset-4 hover:text-blue-200 sm:text-base"
           >
-            https://github.com/softee220/Agent_nutritionist
+            https://github.com/hub2vu/Agent_nutritionist
           </a>
         </div>
       </div>
